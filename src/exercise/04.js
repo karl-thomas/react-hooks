@@ -42,15 +42,11 @@ function Game() {
   ])
   const [bookmark, setBookmark] = useLocalStorageState('bookmark', 0)
 
-  // console.log(history, bookmark, history[bookmark], squares)
   const squares = history[bookmark]
-  console.log('updated squares', squares, bookmark, history)
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
   const status = calculateStatus(winner, squares, nextValue)
 
-  // This is the function your square click handler will call. `square` should
-  // be an index. So if they click the center square, this will be `4`.
   function selectSquare(square) {
     if (winner || squares[square]) return
 
@@ -69,6 +65,31 @@ function Game() {
     setBookmark(0)
   }
 
+  const moves = (
+    <ol>
+      {history.map((squares, step) => {
+        const isCurrent = step === bookmark
+
+        return (
+          <li style={{marginBottom: '1rem'}} key={step}>
+            <button
+              style={{
+                padding: '0.5rem 0.3rem',
+                borderRadius: '8px',
+                marginRight: '1rem',
+              }}
+              onClick={() => setBookmark(step)}
+              disabled={isCurrent}
+            >
+              Go to {step === 0 ? 'game start' : `move #${step}`}{' '}
+            </button>
+            <span>{isCurrent ? '(current)' : ''}</span>
+          </li>
+        )
+      })}
+    </ol>
+  )
+
   return (
     <div className="game">
       <div className="game-board">
@@ -76,6 +97,12 @@ function Game() {
         <button className="restart" onClick={restart}>
           restart
         </button>
+      </div>
+      <div className="game-info">
+        <strong role="status" aria-live="polite">
+          {status}
+        </strong>
+        {moves}
       </div>
     </div>
   )
