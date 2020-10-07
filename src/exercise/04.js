@@ -1,13 +1,24 @@
 // useState: tic tac toe
 // http://localhost:3000/isolated/exercise/04.js
 
-import React, {useState} from 'react'
+import React from 'react'
+import {useLocalStorageState} from '../utils'
 
 function Board() {
-  const [squares, setSquares] = useState(Array(9).fill(null))
-  const [nextValue, setNextValue] = useState(calculateNextValue(squares))
-  const [winner, setWinner] = useState(calculateWinner(squares))
-  const [status, setStatus] = useState(
+  const [squares, setSquares] = useLocalStorageState(
+    'squares',
+    Array(9).fill(null),
+  )
+  const [nextValue, setNextValue] = useLocalStorageState(
+    'nextValue',
+    calculateNextValue(squares),
+  )
+  const [winner, setWinner] = useLocalStorageState(
+    'winner',
+    calculateWinner(squares),
+  )
+  const [status, setStatus] = useLocalStorageState(
+    'status',
     calculateStatus(winner, squares, nextValue),
   )
   // This is the function your square click handler will call. `square` should
