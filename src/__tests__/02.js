@@ -15,5 +15,5 @@ test('App works', () => {
   userEvent.clear(screen.getByRole('textbox', {name: /name/i}))
   userEvent.type(screen.getByRole('textbox', {name: /name/i}), 'bob')
   screen.getByText(/hello.*bob/i)
-  expect(window.localStorage.getItem('name')).toBe('bob')
+  expect(window.localStorage.getItem('name')).toMatch(/bob/i)
 })
