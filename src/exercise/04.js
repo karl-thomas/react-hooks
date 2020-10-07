@@ -44,6 +44,7 @@ function Game() {
 
   // console.log(history, bookmark, history[bookmark], squares)
   const squares = history[bookmark]
+  console.log('updated squares', squares, bookmark, history)
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
   const status = calculateStatus(winner, squares, nextValue)
@@ -53,15 +54,14 @@ function Game() {
   function selectSquare(square) {
     if (winner || squares[square]) return
 
-    let newHistory = [...history]
     const newSquares = [...squares]
     newSquares[square] = nextValue
-    newHistory[bookmark] = newSquares
-    if (winner) {
-      setBookmark(history.length)
-      newHistory = [...newHistory, Array(9).fill(null)]
-    }
+
+    let newHistory = [...history]
+    newHistory[history.length] = newSquares
+
     setHistory(newHistory)
+    setBookmark(history.length)
   }
 
   function restart() {
