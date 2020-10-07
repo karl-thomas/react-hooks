@@ -5,9 +5,13 @@ import React from 'react'
 import {useLocalStorageState} from '../utils'
 
 function Board() {
+  const [history, setHistory] = useLocalStorageState('history', [
+    Array(9).fill(null),
+  ])
+  const [bookmark, setBookmark] = useLocalStorageState('bookmark', 0)
   const [squares, setSquares] = useLocalStorageState(
     'squares',
-    Array(9).fill(null),
+    history[bookmark],
   )
   const [nextValue, setNextValue] = useLocalStorageState(
     'nextValue',
@@ -21,6 +25,25 @@ function Board() {
     'status',
     calculateStatus(winner, squares, nextValue),
   )
+  console.log(history, bookmark, history[bookmark], squares)
+
+  function deriveAndSetFromSquares(newSquares) {
+    const newNextValue = calculateNextValue(newSquares)
+    const newWinner = calculateWinner(newSquares)
+    const newStatus = calculateStatus(newWinner, newSquares, newNextValue)
+    let newHistory = [...history]
+    newHistory[bookmark] = newSquares
+    if (newWinner) {
+      setBookmark(bookmark + 1)
+      newHistory = [...newHistory, Array(9).fill(null)]
+    }
+    setSquares(newSquares)
+    setHistory(newHistory)
+    setNextValue(newNextValue)
+    setWinner(newWinner)
+    setStatus(newStatus)
+  }
+
   // This is the function your square click handler will call. `square` should
   // be an index. So if they click the center square, this will be `4`.
   function selectSquare(square) {
@@ -28,24 +51,11 @@ function Board() {
 
     let newSquares = [...squares]
     newSquares[square] = nextValue
-    const newNextValue = calculateNextValue(newSquares)
-    const newWinner = calculateWinner(newSquares)
-    const newStatus = calculateStatus(newWinner, newSquares, newNextValue)
-    setSquares(newSquares)
-    setNextValue(newNextValue)
-    setWinner(newWinner)
-    setStatus(newStatus)
+    deriveAndSetFromSquares(newSquares)
   }
 
   function restart() {
-    const newSquares = Array(9).fill(null)
-    const newNextValue = calculateNextValue(newSquares)
-    const newWinner = calculateWinner(newSquares)
-    const newStatus = calculateStatus(newWinner, newSquares, newNextValue)
-    setSquares(newSquares)
-    setNextValue(newNextValue)
-    setWinner(newWinner)
-    setStatus(newStatus)
+    deriveAndSetFromSquares(Array(9).fill(null))
   }
 
   function renderSquare(i) {
