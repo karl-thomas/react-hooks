@@ -4,63 +4,10 @@
 import React from 'react'
 import {useLocalStorageState} from '../utils'
 
-function Board() {
-  const [history, setHistory] = useLocalStorageState('history', [
-    Array(9).fill(null),
-  ])
-  const [bookmark, setBookmark] = useLocalStorageState('bookmark', 0)
-  const [squares, setSquares] = useLocalStorageState(
-    'squares',
-    history[bookmark],
-  )
-  const [nextValue, setNextValue] = useLocalStorageState(
-    'nextValue',
-    calculateNextValue(squares),
-  )
-  const [winner, setWinner] = useLocalStorageState(
-    'winner',
-    calculateWinner(squares),
-  )
-  const [status, setStatus] = useLocalStorageState(
-    'status',
-    calculateStatus(winner, squares, nextValue),
-  )
-  console.log(history, bookmark, history[bookmark], squares)
-
-  function deriveAndSetFromSquares(newSquares) {
-    const newNextValue = calculateNextValue(newSquares)
-    const newWinner = calculateWinner(newSquares)
-    const newStatus = calculateStatus(newWinner, newSquares, newNextValue)
-    let newHistory = [...history]
-    newHistory[bookmark] = newSquares
-    if (newWinner) {
-      setBookmark(bookmark + 1)
-      newHistory = [...newHistory, Array(9).fill(null)]
-    }
-    setSquares(newSquares)
-    setHistory(newHistory)
-    setNextValue(newNextValue)
-    setWinner(newWinner)
-    setStatus(newStatus)
-  }
-
-  // This is the function your square click handler will call. `square` should
-  // be an index. So if they click the center square, this will be `4`.
-  function selectSquare(square) {
-    if (winner || squares[square]) return
-
-    let newSquares = [...squares]
-    newSquares[square] = nextValue
-    deriveAndSetFromSquares(newSquares)
-  }
-
-  function restart() {
-    deriveAndSetFromSquares(Array(9).fill(null))
-  }
-
+function Board({squares, onClick}) {
   function renderSquare(i) {
     return (
-      <button className="square" onClick={() => selectSquare(i)}>
+      <button className="square" onClick={() => onClick(i)}>
         {squares[i]}
       </button>
     )
@@ -85,19 +32,50 @@ function Board() {
         {renderSquare(7)}
         {renderSquare(8)}
       </div>
-      {status ? <p>{status}</p> : ''}
-      <button className="restart" onClick={restart}>
-        restart
-      </button>
     </div>
   )
 }
 
 function Game() {
+  const [history, setHistory] = useLocalStorageState('history', [
+    Array(9).fill(null),
+  ])
+  const [bookmark, setBookmark] = useLocalStorageState('bookmark', 0)
+
+  // console.log(history, bookmark, history[bookmark], squares)
+  const squares = history[bookmark]
+  const nextValue = calculateNextValue(squares)
+  const winner = calculateWinner(squares)
+  const status = calculateStatus(winner, squares, nextValue)
+
+  // This is the function your square click handler will call. `square` should
+  // be an index. So if they click the center square, this will be `4`.
+  function selectSquare(square) {
+    if (winner || squares[square]) return
+
+    let newHistory = [...history]
+    const newSquares = [...squares]
+    newSquares[square] = nextValue
+    newHistory[bookmark] = newSquares
+    if (winner) {
+      setBookmark(history.length)
+      newHistory = [...newHistory, Array(9).fill(null)]
+    }
+    setHistory(newHistory)
+  }
+
+  function restart() {
+    setHistory([Array(9).fill(null)])
+    setBookmark(0)
+  }
+
   return (
     <div className="game">
       <div className="game-board">
-        <Board />
+        <Board squares={squares} onClick={selectSquare} />
+        <button className="restart" onClick={restart}>
+          restart
+        </button>
       </div>
     </div>
   )
