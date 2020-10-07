@@ -45,7 +45,6 @@ const useLocalStorage = (
 
 function Greeting({initialName = ''}) {
   const [name, setName] = useLocalStorage('name', initialName)
-  console.log('name', name)
   function handleChange(event) {
     setName(event.target.value)
   }
