@@ -15,6 +15,8 @@ function PokemonInfo({pokemonName}) {
 
   React.useEffect(() => {
     if (pokemonName) {
+      setError(null)
+      setPokemon(null)
       fetchPokemon(pokemonName).then(setPokemon).catch(setError)
     }
   }, [pokemonName])
